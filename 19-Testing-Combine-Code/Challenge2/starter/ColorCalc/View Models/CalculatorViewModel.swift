@@ -110,7 +110,7 @@ final class CalculatorViewModel: ObservableObject {
       .map { values -> String in
         if let values = values {
           return [values.0, values.1, values.2, values.3]
-            .map { String(describing: Int($0 * 155)) }
+            .map { String(describing: Int($0 * 255)) }
             .joined(separator: ", ")
         } else {
           return "---, ---, ---, ---"

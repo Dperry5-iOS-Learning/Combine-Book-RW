@@ -65,7 +65,7 @@ final class CalculatorViewModel: ObservableObject {
   func process(_ input: String) {
     switch input {
     case Constant.clear:
-      break
+      hexText = "#"
     case Constant.backspace:
       if hexText.count > 1 {
         hexText.removeLast()

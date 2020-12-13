@@ -149,4 +149,21 @@ class ColorCalcTests: XCTestCase {
       "Color expected to be \(expected) but was \(result)"
     )
   }
+  
+  func test_processClearSetsHexToHashtag() {
+    // GIVEN
+    let expected = "#"
+    var result = ""
+    
+    viewModel.$hexText
+      .dropFirst()
+      .sink(receiveValue: { result = $0 })
+      .store(in: &subscriptions)
+    
+    // WHEN
+    viewModel.process(CalculatorViewModel.Constant.clear)
+    
+    // THEN
+    XCTAssert(result == expected, "Hex was expected to be \(expected) but was \(result)")
+  }
 }

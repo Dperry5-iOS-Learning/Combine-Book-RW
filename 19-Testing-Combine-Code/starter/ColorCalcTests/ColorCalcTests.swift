@@ -32,12 +32,95 @@ import SwiftUI
 @testable import ColorCalc
 
 class ColorCalcTests: XCTestCase {
+  var viewModel: CalculatorViewModel!
+  var subscriptions = Set<AnyCancellable>()
   
   override func setUp() {
-    
+    viewModel = CalculatorViewModel()
   }
   
   override func tearDown() {
+    subscriptions = []
+  }
+  
+  // MARK:- Issue 1: Incorrect name displayed
+  func test_correctNameRecieved() {
+    // GIVEN
+    let expected = "rwGreen 66%"
+    var result = ""
+    viewModel.$name
+      .sink(receiveValue: { result = $0 })
+      .store(in: &subscriptions)
     
+    // WHEN
+    viewModel.hexText = "006636AA"
+    
+    // THEN
+    XCTAssert(result == expected, "Name expected to be \(expected) but was \(result)")
+  }
+  
+  // MARK:- Issue #2: Tapping Backspace deletes two characters
+  func test_processBackspaceDeletesLastCharacter() {
+    // GIVEN
+    let expected = "#0080F"
+    var result = ""
+    viewModel.$hexText
+      .dropFirst()
+      .sink(receiveValue: { result = $0})
+      .store(in: &subscriptions)
+    
+    // WHEN
+    viewModel.process(CalculatorViewModel.Constant.backspace)
+    
+    // THEN
+    XCTAssert(result == expected, "Hex was expected to be \(expected) but was \(result)")
+  }
+  
+  // MARK:- Issue #3: Incorrect background color
+  func test_correctColorReceived() {
+    // GIVEN
+    let expected = Color(hex: ColorName.rwGreen.rawValue)!
+    var result: Color = .clear
+    
+    viewModel.$color
+      .sink(receiveValue: { result = $0})
+      .store(in: &subscriptions)
+    
+    // WHEN
+    viewModel.hexText = ColorName.rwGreen.rawValue
+    
+    // THEN
+    XCTAssert(result == expected, "Color expected to be \(expected) but was \(result)")
+  }
+  
+  func test_processBackspaceReceivesCorrectColor() {
+    // GIVEN
+    let expected = Color.white
+    var result = Color.clear
+    
+    viewModel.$color
+      .sink(receiveValue: { result = $0})
+      .store(in: &subscriptions)
+    // WHEN
+    viewModel.process(CalculatorViewModel.Constant.backspace)
+    
+    // THEN
+    XCTAssert(result == expected, "Hex was expected to be \(expected) but was \(result)")
+  }
+  
+  func test_whiteColorReceivedForBadData() {
+    // GIVEN
+    let expected = Color.white
+    var result = Color.clear
+    
+    viewModel.$color
+      .sink(receiveValue: { result = $0})
+      .store(in: &subscriptions)
+    
+    // WHEN
+    viewModel.hexText = "abc"
+    
+    // THEN
+    XCTAssert(result == expected, "Hex was expected to be \(expected) but was \(result)")
   }
 }
